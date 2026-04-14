@@ -1,0 +1,28 @@
+*timber.txt*  manage tree-sitter assets for built-in vim.treesitter
+
+Timber installs parser shared libraries and query files into Neovim data
+directory so it can discover them through 'runtimepath'.
+
+COMMANDS                                            *timber-commands*
+
+    :TimberInstall {lang}
+        install parser and query assets for {lang}
+
+    :TimberInfo [lang]
+        show registry and installed state for a language
+
+    :TimberCheckUpdates
+        list installed languages with newer bundled revisions available
+
+    :TimberUpdate[!] [lang]
+        reinstall outdated assets
+        use ! to skip confirmation
+
+CONFIGURATION                                    *timber-configuration*
+
+    lua require("timber").setup({
+        prompt = true,
+        auto_start = true,
+    })
+
+vim:tw=78:ts=8:noet:ft=help:norl:
