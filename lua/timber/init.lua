@@ -116,7 +116,10 @@ function M.ensure_for_buf(bufnr)
     local missing = missing_assets(lang)
     if #missing == 0 then
         if config.auto_start then
-            runtime.start(bufnr, lang)
+            local ok, err = runtime.start(bufnr, lang)
+            if not ok then
+                ui.notify(("failed to start treesitter for %s: %s"):format(lang, err), vim.log.levels.ERROR)
+            end
         end
         return
     end
@@ -166,7 +169,10 @@ function M.install(lang, opts)
 
     ui.stop_spinner(spinner, ("installed Tree-sitter assets for %s"):format(resolved))
     if opts.start and opts.bufnr and config.auto_start then
-        runtime.start(opts.bufnr, resolved)
+        local ok, err = runtime.start(opts.bufnr, resolved)
+        if not ok then
+            ui.notify(("failed to start treesitter for %s: %s"):format(resolved, err), vim.log.levels.ERROR)
+        end
     end
 end
 
@@ -266,11 +272,33 @@ function M.update(lang, opts)
     end
 end
 
----clear installed metadata for a language.
+---clear installed metadata for a language
 function M.clear(lang)
     local resolved = config.lang_overrides[lang] or registry.resolve(lang) or lang
     installer.clear_state(resolved)
     ui.notify(("Cleared Timber state for %s"):format(resolved))
+end
+
+---manually start treesitter for the current buffer
+function M.start(bufnr)
+    bufnr = bufnr or vim.api.nvim_get_current_buf()
+    if runtime.is_special_buffer(bufnr) then
+        ui.notify("not a regular file buffer", vim.log.levels.WARN)
+        return
+    end
+
+    local lang = language_for_buf(bufnr)
+    if not lang then
+        ui.notify("no treesitter language for this buffer", vim.log.levels.WARN)
+        return
+    end
+
+    local ok, err = runtime.start(bufnr, lang)
+    if ok then
+        ui.notify(("started treesitter for %s"):format(lang))
+    else
+        ui.notify(("failed to start treesitter for %s: %s"):format(lang, err), vim.log.levels.ERROR)
+    end
 end
 
 return M

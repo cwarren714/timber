@@ -40,6 +40,12 @@ end, {
     nargs = "?",
 })
 
+vim.api.nvim_create_user_command("TimberStart", function()
+    timber.start()
+end, {
+    nargs = 0,
+})
+
 vim.api.nvim_create_autocmd("FileType", {
     group = vim.api.nvim_create_augroup("timber", { clear = true }),
     callback = function(ev)
