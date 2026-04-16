@@ -171,15 +171,17 @@ function M.install(lang, opts)
         error(("unsupported language: %s"):format(lang))
     end
 
-    compile_parser(lang, entry.parser, opts.progress)
+    if not entry.query_only then
+        compile_parser(lang, entry.parser, opts.progress)
+    end
     install_queries(lang, entry.queries, opts.progress)
 
     state.set(lang, {
         installed_at = os.date("!%Y-%m-%dT%H:%M:%SZ"),
-        parser = {
+        parser = entry.parser and {
             revision = entry.parser.revision,
             url = entry.parser.url,
-        },
+        } or nil,
         queries = {
             revision = entry.queries.revision,
             url = entry.queries.url,
@@ -198,7 +200,7 @@ function M.outdated(lang)
         return nil
     end
 
-    local parser_outdated = installed.parser == nil or installed.parser.revision ~= entry.parser.revision
+    local parser_outdated = not entry.query_only and (installed.parser == nil or installed.parser.revision ~= entry.parser.revision)
     local queries_outdated = installed.queries == nil or installed.queries.revision ~= entry.queries.revision
     if not parser_outdated and not queries_outdated then
         return nil

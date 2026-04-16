@@ -34,11 +34,18 @@ local registry = {
             url = "https://github.com/tree-sitter/tree-sitter-html",
         },
     },
+    ecma = {
+        query_only = true,
+    },
     javascript = {
+        requires = { "ecma", "jsx" },
         parser = {
             revision = "58404d8cf191d69f2674a8fd507bd5776f46cb11",
             url = "https://github.com/tree-sitter/tree-sitter-javascript",
         },
+    },
+    jsx = {
+        query_only = true,
     },
     json = {
         filetypes = { "json", "jsonc" },
